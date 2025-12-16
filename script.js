@@ -2,7 +2,7 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 const image = new Image();
-image.src = "image.png"; // imagem do rosto
+image.src = "image.png"; // ✔ nome correto do arquivo
 
 const text = "JULIANO BALBINO";
 
@@ -15,7 +15,7 @@ let imageParticles = [];
 let showText = true;
 let showImage = false;
 
-const mouse = { x: null, y: null, radius: 90 };
+const mouse = { x: null, y: null, radius: 80 };
 
 // =======================
 // EVENTOS
@@ -57,7 +57,7 @@ class Particle {
     this.y = Math.random() * -canvas.height;
     this.baseX = x;
     this.baseY = y;
-    this.size = 1.5;
+    this.size = 1.4;
     this.speed = Math.random() * 6 + 4;
     this.color = `rgb(${r},${g},${b})`;
   }
@@ -77,24 +77,16 @@ class Particle {
     const dist = Math.sqrt(dx * dx + dy * dy);
 
     if (dist < mouse.radius) {
-      this.x -= dx * 0.12;
-      this.y -= dy * 0.12;
+      this.x -= dx * 0.1;
+      this.y -= dy * 0.1;
     }
   }
 
   draw() {
-    ctx.save();
-
-    // 🔥 NEON AZUL
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = this.color;
-
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
-
-    ctx.restore();
   }
 }
 
@@ -114,22 +106,9 @@ function createAllParticles() {
   ctx.font = `bold ${fontSize}px Arial`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  ctx.fillStyle = "white";
 
-  const textY = canvas.height * 0.22;
-
-  // 🔵 GRADIENTE AZUL NEON
-  const gradient = ctx.createLinearGradient(
-    canvas.width / 2 - maxWidth / 2,
-    0,
-    canvas.width / 2 + maxWidth / 2,
-    0
-  );
-
-  gradient.addColorStop(0, "#00eaff");
-  gradient.addColorStop(0.5, "#1e90ff");
-  gradient.addColorStop(1, "#0050ff");
-
-  ctx.fillStyle = gradient;
+  const textY = canvas.height * 0.2;
   ctx.fillText(text, canvas.width / 2, textY);
 
   // ---------- IMAGEM ----------
@@ -162,11 +141,11 @@ function createAllParticles() {
         const g = imageData.data[i + 1];
         const b = imageData.data[i + 2];
 
-        // TEXTO (parte superior)
-        if (y < canvas.height * 0.35) {
-          textParticles.push(new Particle(x, y, r, g, b));
+        // TEXTO (branco)
+        if (r > 200 && g > 200 && b > 200) {
+          textParticles.push(new Particle(x, y, 255, 255, 255));
         }
-        // IMAGEM
+        // IMAGEM (cores reais)
         else {
           imageParticles.push(new Particle(x, y, r, g, b));
         }
@@ -181,19 +160,8 @@ function createAllParticles() {
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (showText) {
-    textParticles.forEach(p => {
-      p.update();
-      p.draw();
-    });
-  }
-
-  if (showImage) {
-    imageParticles.forEach(p => {
-      p.update();
-      p.draw();
-    });
-  }
+  if (showText) textParticles.forEach(p => { p.update(); p.draw(); });
+  if (showImage) imageParticles.forEach(p => { p.update(); p.draw(); });
 
   requestAnimationFrame(animate);
 }
@@ -207,5 +175,6 @@ image.onload = () => {
 
   setTimeout(() => showImage = true, 1200);
 };
+
 
 
